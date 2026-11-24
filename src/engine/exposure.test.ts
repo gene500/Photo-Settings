@@ -1,11 +1,49 @@
 import {
   LIGHT_EV,
+  apertureStops,
+  floorShutter,
+  isoStops,
   reciprocalShutter,
   shutterFor,
   snapAperture,
+  snapApertureWithin,
   snapIso,
   snapShutter,
+  snapShutterWithin,
 } from './exposure'
+
+describe('limits-aware snapping', () => {
+  it('snapApertureWithin never returns a value wider than the lens allows', () => {
+    // 4.4 is nearer to f/4 than f/4.5, but f/4 is wider than this lens can open.
+    expect(snapApertureWithin(4.4, 4.4, 22)).toBe(4.5)
+  })
+
+  it('snapApertureWithin never returns a value narrower than the lens stops down to', () => {
+    expect(snapApertureWithin(30, 2, 22)).toBe(22)
+  })
+
+  it('snapApertureWithin falls back to a clamped value when no standard stop fits', () => {
+    expect(snapApertureWithin(1.95, 1.93, 1.97)).toBeCloseTo(1.95, 8)
+  })
+
+  it('snapShutterWithin stays inside the body range', () => {
+    expect(snapShutterWithin(1 / 9000, 1 / 4000, 30)).toBeCloseTo(1 / 4000, 10)
+    expect(snapShutterWithin(120, 1 / 4000, 30)).toBe(30)
+  })
+
+  it('floorShutter returns the largest standard time that is not slower than the limit', () => {
+    expect(floorShutter(0.0011, 1 / 8000, 30)).toBeCloseTo(0.001, 10)
+  })
+
+  it('apertureStops and isoStops list standard values inside the range', () => {
+    expect(apertureStops(4, 8)).toEqual([4, 4.5, 5, 5.6, 6.3, 7.1, 8])
+    expect(isoStops(100, 400)).toEqual([100, 125, 160, 200, 250, 320, 400])
+  })
+
+  it('isoStops still returns the range ends when no standard value fits', () => {
+    expect(isoStops(101, 102)).toEqual([101, 102])
+  })
+})
 
 describe('shutterFor', () => {
   it('follows sunny 16: f/16, ISO 100, bright sun is about 1/125', () => {

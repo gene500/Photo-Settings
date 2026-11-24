@@ -4,8 +4,7 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A4 | MVP T6-7: exposure math + suggest engine | active | 60 min | Heavy |
-| A5 | MVP T8: scenario picker + result card | pending | 30 min | Medium |
+| A5 | MVP T8: scenario picker + result card | active | 30 min | Medium |
 | A6 | MVP T9: polish, README, deploy prep | pending | 25 min | Medium |
 | A7 | Phase 1: EXIF import (opt-in) | pending | 60 min | Heavy |
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
@@ -22,6 +21,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 | ID | Task | Done |
 |----|------|------|
 | A1 | Design doc, builder check, MVP plan, Phase 0 scaffold (MVP T1) | 2026-11-23: test, lint, build pass; dev server served 200 |
+| A4 | MVP T6-7: exposure math + suggest engine | 2026-11-23: 66 tests, lint, build pass; 315-case sweep stays inside gear limits on 3 gear kinds; engine imports no UI; sample outputs sanity-checked by eye |
 | A3 | MVP T3-5: gear types, storage, form | 2026-11-23: 31 tests, lint, build pass; storage handles corrupt and blocked IndexedDB; saveGear returns boolean (plan updated) |
 | A2 | MVP T2: theme, fonts, app shell | 2026-11-23: 3 tests, lint, build pass; computed colors match Photo-App in light and dark; no horizontal scroll at 390px |
 
@@ -31,8 +31,9 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 - **Repo:** `~/Photo-Settings`, remote `https://github.com/gene500/Photo-Settings` (was empty). Local branch `main`; one local commit (scaffold + docs); nothing pushed yet. Pushing waits for the owner's "push".
 - **Execution:** Native (I implement tasks in-session), one fresh Opus review of the whole branch at the end (FINAL). Owner said "start working on everything" on 2026-11-23; local commits after each working step follow the owner's spec.
 - **Owner decisions (2026-11-23):** design approved; scenario goal input and output shape approved; MVP-first phase order approved.
-- **Just finished:** MVP Tasks 1-5 (scaffold, theme, Card, types, gear helpers, storage, gear form wired into App). Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does). Theme runtime vars are `--c-*`, mapped to Tailwind colours in `@theme inline` in `src/index.css`.
-- **Next:** MVP Tasks 6-7 (exposure math, suggest engine), then 8-9, then A11 theme swap last.
+- **Just finished:** MVP Tasks 1-7 (scaffold, theme, Card, types, gear helpers, storage, gear form wired into App, exposure math, suggestion engine with explanations).
+- **Known limits (not bugs, decide later):** night-sky really wants Manual mode but `ExposureMode` only has aperture/shutter priority; the engine raises ISO before opening the aperture (plan decision), so low light can use a slightly higher ISO than needed. Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does). Theme runtime vars are `--c-*`, mapped to Tailwind colours in `@theme inline` in `src/index.css`.
+- **Next:** MVP Task 8 (scenario picker + result card), then 9, then A11 theme swap last. Format helpers `formatAperture` and `formatShutter` in `src/engine/format.ts` are ready for the result card.
 - **Blocked:** nothing.
 
 ## Decisions

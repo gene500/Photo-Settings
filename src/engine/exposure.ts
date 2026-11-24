@@ -75,6 +75,56 @@ export function snapShutter(seconds: number): number {
   return snapTo(SHUTTERS, seconds)
 }
 
+const EPS = 1e-9
+
+/** Standard values from `list` that lie inside [lo, hi], in ascending order. */
+function within(list: readonly number[], lo: number, hi: number): number[] {
+  return list.filter((x) => x >= lo * (1 - EPS) && x <= hi * (1 + EPS))
+}
+
+function clamp(value: number, lo: number, hi: number): number {
+  return Math.min(hi, Math.max(lo, value))
+}
+
+/** Standard f-numbers the lens can reach, from its widest to its narrowest. */
+export function apertureStops(widest: number, narrowest: number): number[] {
+  return within(APERTURES, widest, narrowest)
+}
+
+/** Standard ISO values the body offers; the range ends if no standard value fits. */
+export function isoStops(lo: number, hi: number): number[] {
+  const stops = within(ISOS, lo, hi)
+  return stops.length > 0 ? stops : lo === hi ? [lo] : [lo, hi]
+}
+
+/** Nearest standard f-number that the lens can actually set. */
+export function snapApertureWithin(n: number, widest: number, narrowest: number): number {
+  const stops = apertureStops(widest, narrowest)
+  return stops.length > 0 ? snapTo(stops, n) : clamp(n, widest, narrowest)
+}
+
+/** Nearest standard shutter time the body can actually set. */
+export function snapShutterWithin(
+  seconds: number,
+  fastest: number,
+  slowest: number,
+): number {
+  const stops = within(SHUTTERS, fastest, slowest)
+  return stops.length > 0 ? snapTo(stops, seconds) : clamp(seconds, fastest, slowest)
+}
+
+/** Largest standard shutter time that is not slower than `maxSeconds`, inside the body range. */
+export function floorShutter(
+  maxSeconds: number,
+  fastest: number,
+  slowest: number,
+): number {
+  const stops = within(SHUTTERS, fastest, slowest).filter(
+    (x) => x <= maxSeconds * (1 + EPS),
+  )
+  return stops.length > 0 ? stops[stops.length - 1] : clamp(maxSeconds, fastest, slowest)
+}
+
 /** Shutter time in seconds that gives a correct exposure: N² / (2^EV100 · ISO/100). */
 export function shutterFor(aperture: number, iso: number, ev100: number): number {
   return (aperture * aperture) / (2 ** ev100 * (iso / 100))
