@@ -9,7 +9,7 @@
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
 | A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
 | A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
-| A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked 25 min | Medium |
+| A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked | 25 min | Medium |
 | A11 | Swap in Photo-App theme CSS (owner paste) | pending | 30 min | Medium |
 | SEC | Security review of pending changes | pending | 15 min | Medium |
 | FINAL | Full check, merge, push, confirm deploy+CI | pending | 20 min | Heavy |
