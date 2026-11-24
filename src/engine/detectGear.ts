@@ -21,7 +21,9 @@ const APERTURE =
   /(?<![A-Za-z])f\s*\/?\s*(\d+(?:\.\d+)?)(?:\s*-\s*(?:f\s*\/?\s*)?(\d+(?:\.\d+)?))?/i
 
 /** Reads focal length and widest aperture out of a lens name such as "SIGMA 18-50mm F2.8 DC DN". */
-export function parseLensName(name: string): ParsedLens | null {
+export function parseLensName(rawName: string): ParsedLens | null {
+  // Real lens names are short. Cutting the text first keeps the patterns fast on hostile input.
+  const name = rawName.slice(0, 200)
   const focal = FOCAL.exec(name)
   if (!focal) return null
   const min = Number(focal[1])
@@ -39,6 +41,18 @@ export function parseLensName(name: string): ParsedLens | null {
     }
   }
   return result
+}
+
+function minOf(values: number[]): number {
+  let m = Infinity
+  for (const v of values) if (v < m) m = v
+  return m
+}
+
+function maxOf(values: number[]): number {
+  let m = -Infinity
+  for (const v of values) if (v > m) m = v
+  return m
 }
 
 function mostCommon(values: string[]): string | null {
@@ -61,6 +75,14 @@ function mostCommon(values: string[]): string | null {
  * defaults and are listed in `guessed`. Returns null if there is nothing usable.
  */
 export function detectGear(photos: PhotoRecord[]): DetectedGear | null {
+  try {
+    return detectGearUnsafe(photos)
+  } catch {
+    return null
+  }
+}
+
+function detectGearUnsafe(photos: PhotoRecord[]): DetectedGear | null {
   const body = mostCommon(photos.map((p) => p.camera.trim()).filter((c) => c !== ''))
   if (body === null) return null
   const ofBody = photos.filter((p) => p.camera.trim() === body)
@@ -75,7 +97,7 @@ export function detectGear(photos: PhotoRecord[]): DetectedGear | null {
 
   const parsed = lens === null ? null : parseLensName(lens)
   const focals = ofLens.map((p) => p.focalMm).filter((f) => f > 0)
-  const minAperture = Math.min(...ofLens.map((p) => p.aperture))
+  const minAperture = minOf(ofLens.map((p) => p.aperture))
 
   let focalMinMm: number
   let focalMaxMm: number
@@ -86,8 +108,8 @@ export function detectGear(photos: PhotoRecord[]): DetectedGear | null {
     focalMinMm = parsed.focalMinMm
     focalMaxMm = parsed.focalMaxMm
   } else if (focals.length > 0) {
-    focalMinMm = Math.min(...focals)
-    focalMaxMm = Math.max(...focals)
+    focalMinMm = minOf(focals)
+    focalMaxMm = maxOf(focals)
     guessed.push('focal length range (read from your photos, so it may be wider)')
   } else {
     focalMinMm = DEFAULT_GEAR.focalMinMm
@@ -101,12 +123,12 @@ export function detectGear(photos: PhotoRecord[]): DetectedGear | null {
   } else {
     const at = (focal: number) => {
       const near = ofLens.filter((p) => p.focalMm === focal)
-      return near.length > 0 ? Math.min(...near.map((p) => p.aperture)) : minAperture
+      return near.length > 0 ? minOf(near.map((p) => p.aperture)) : minAperture
     }
-    apertureMaxWide = focals.length > 0 ? at(Math.min(...focals)) : minAperture
+    apertureMaxWide = focals.length > 0 ? at(minOf(focals)) : minAperture
     apertureMaxTele = Math.max(
       apertureMaxWide,
-      focals.length > 0 ? at(Math.max(...focals)) : minAperture,
+      focals.length > 0 ? at(maxOf(focals)) : minAperture,
     )
     guessed.push('widest aperture (read from your photos, so it may be wider)')
   }
@@ -121,8 +143,8 @@ export function detectGear(photos: PhotoRecord[]): DetectedGear | null {
     apertureMaxWide,
     apertureMaxTele,
     apertureMin: Math.max(DEFAULT_GEAR.apertureMin, apertureMaxTele),
-    isoMin: Math.min(DEFAULT_GEAR.isoMin, ...isos),
-    isoMax: Math.max(DEFAULT_GEAR.isoMax, ...isos),
+    isoMin: Math.min(DEFAULT_GEAR.isoMin, minOf(isos)),
+    isoMax: Math.max(DEFAULT_GEAR.isoMax, maxOf(isos)),
     shutterSlowestS: DEFAULT_GEAR.shutterSlowestS,
     shutterFastestS: DEFAULT_GEAR.shutterFastestS,
     stabilized: DEFAULT_GEAR.stabilized,

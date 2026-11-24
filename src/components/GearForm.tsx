@@ -151,6 +151,7 @@ export function GearForm({ value, onChange }: GearFormProps) {
           <input
             id={`${baseId}-body`}
             type="text"
+            maxLength={120}
             className={fieldClass}
             value={draft.bodyName}
             onChange={(e) =>
@@ -165,6 +166,7 @@ export function GearForm({ value, onChange }: GearFormProps) {
           <input
             id={`${baseId}-lens`}
             type="text"
+            maxLength={120}
             className={fieldClass}
             value={draft.lensName}
             onChange={(e) =>

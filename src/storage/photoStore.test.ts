@@ -72,6 +72,17 @@ describe('photoStore', () => {
     expect(loaded).toEqual(expect.arrayContaining([photo(1), photo(2)]))
   })
 
+  it('loadPhotos skips stored records that are malformed', async () => {
+    await addPhotos([photo(1), photo(2)])
+    const { openAppDb } = await import('./db')
+    const db = await openAppDb()
+    await db.put('photos', { camera: 7, lens: null }, 'junk-1')
+    await db.put('photos', 'not an object', 'junk-2')
+    db.close()
+    const loaded = await loadPhotos()
+    expect(loaded).toHaveLength(2)
+  })
+
   it('clearPhotos empties the store and returns true', async () => {
     await addPhotos([photo(1), photo(2)])
     expect(await clearPhotos()).toBe(true)

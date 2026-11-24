@@ -125,3 +125,31 @@ describe('detectGear', () => {
     expect(validateGear(d.gear)).toEqual(d.gear)
   })
 })
+
+describe('hostile or very large input', () => {
+  it('parses a 64,000-digit lens name quickly', () => {
+    const start = performance.now()
+    parseLensName('1'.repeat(64_000))
+    parseLensName(`${'1'.repeat(32_000)}.${'1'.repeat(32_000)}-${'1'.repeat(1000)}`)
+    expect(performance.now() - start).toBeLessThan(250)
+  })
+
+  it('still reads a normal lens name with long junk after it', () => {
+    expect(parseLensName(`SIGMA 18-50mm F2.8 ${'x'.repeat(5000)}`)).toMatchObject({
+      focalMinMm: 18,
+      focalMaxMm: 50,
+    })
+  })
+
+  it('handles 200,000 photos from one lens without throwing', () => {
+    const many = Array.from({ length: 200_000 }, (_, i) =>
+      photo({ lens: 'Mystery lens', focalMm: 18 + (i % 32), iso: 100 + (i % 50) }, i),
+    )
+    expect(detectGear(many)).not.toBeNull()
+  })
+
+  it('returns null instead of throwing for a malformed record', () => {
+    const bad = [{ camera: 5 }] as unknown as PhotoRecord[]
+    expect(detectGear(bad)).toBeNull()
+  })
+})

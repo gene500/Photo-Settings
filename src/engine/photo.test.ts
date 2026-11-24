@@ -37,6 +37,16 @@ describe('toPhotoRecord', () => {
     expect(p?.ev).toBeCloseTo(exposureValue(2.8, 1 / 250, 400), 9)
   })
 
+  it('caps very long camera and lens names', () => {
+    const p = toPhotoRecord({
+      ...full,
+      Model: 'M'.repeat(5000),
+      LensModel: 'L'.repeat(5000),
+    })
+    expect(p?.camera.length).toBeLessThanOrEqual(120)
+    expect(p?.lens.length).toBeLessThanOrEqual(120)
+  })
+
   it('puts the make in front of a model that does not start with it', () => {
     expect(toPhotoRecord({ ...full, Make: 'SONY', Model: 'ILCE-7M3' })?.camera).toBe(
       'SONY ILCE-7M3',

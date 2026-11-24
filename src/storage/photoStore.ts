@@ -54,12 +54,27 @@ export async function addPhotos(records: PhotoRecord[]): Promise<AddResult | nul
   }
 }
 
+function isPhotoRecord(v: unknown): v is PhotoRecord {
+  if (typeof v !== 'object' || v === null) return false
+  const r = v as Record<string, unknown>
+  const num = (x: unknown) => typeof x === 'number' && Number.isFinite(x)
+  return (
+    typeof r.camera === 'string' &&
+    typeof r.lens === 'string' &&
+    num(r.focalMm) &&
+    num(r.aperture) &&
+    num(r.shutterS) &&
+    num(r.iso) &&
+    num(r.timestamp)
+  )
+}
+
 /** All stored photos, or an empty list if there are none or storage is unavailable. */
 export async function loadPhotos(): Promise<PhotoRecord[]> {
   try {
     const db = await openAppDb()
     try {
-      return (await db.getAll(STORE)) as PhotoRecord[]
+      return ((await db.getAll(STORE)) as unknown[]).filter(isPhotoRecord)
     } finally {
       db.close()
     }

@@ -26,14 +26,17 @@ function toTime(v: unknown): number | null {
   return Number.isFinite(ms) ? ms : null
 }
 
+/** Longest camera or lens name we keep. Real names are far shorter; this stops hostile files. */
+export const MAX_NAME_LENGTH = 120
+
 function text(v: unknown): string {
-  return typeof v === 'string' ? v.trim() : ''
+  return typeof v === 'string' ? v.trim().slice(0, MAX_NAME_LENGTH) : ''
 }
 
 function cameraName(make: string, model: string): string {
   if (!model) return make
   if (!make || model.toLowerCase().startsWith(make.toLowerCase())) return model
-  return `${make} ${model}`
+  return `${make} ${model}`.slice(0, MAX_NAME_LENGTH)
 }
 
 /**
