@@ -4,12 +4,11 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A7 | Phase 1: EXIF import (opt-in) | active | 60 min | Heavy |
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
 | A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
 | A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
 | A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked | 25 min | Medium |
-| F1 | Fix explanation text when light is too dark | pending | 10 min | Light |
+| F1 | Fix explanation text when light is too dark | active | 10 min | Light |
 | SEC | Security review of pending changes | pending | 15 min | Medium |
 | FINAL | Full check, merge, push, confirm deploy+CI | pending | 20 min | Heavy |
 
@@ -20,6 +19,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 | ID | Task | Done |
 |----|------|------|
 | A1 | Design doc, builder check, MVP plan, Phase 0 scaffold (MVP T1) | 2026-11-23: test, lint, build pass; dev server served 200 |
+| A7 | Phase 1: EXIF import (opt-in) | 2026-11-23: 7 tasks done. Storage v2 (photos, settings stores), photo helpers, photoStore (dedupe, quota-safe), importer (exifr lite, 4 files at a time, 500 per write), detectGear, opt-in PhotoMode card wired into App, README section. 178 tests (5 full runs in a row stable), lint, build pass. Browser check on a build: 24 generated EXIF JPEGs + 1 no-EXIF + 1 repeat gave "Imported 24, skipped 1, already imported 1"; re-import gave 0 added, 3 already; only the app's own 5 files were requested (no network during import); Use this gear filled the form; reload kept toggle, gear and detected card; delete needs 2 clicks and clears photos but keeps the gear. Checked desktop light and phone dark (no overflow); phone light and desktop dark not separately checked (same theme tokens). Server and browser closed |
 | A11 | Swap in Photo-App theme CSS | 2026-11-23: src/index.css is the owner's pasted theme, byte-for-byte except (1) Google Fonts @import removed (self-hosted fontsource, privacy) and (2) font names use the fontsource "... Variable" names. src/index.css is in .prettierignore so it stays diffable against docs/reference/photo-app-theme.css. Components moved to theme classes (card, input, banner-error, bg-surface/hover, ring-border, text-foreground; theme `ink` is the button colour, not text). 86 tests (new theme guard test), lint, build pass. Checked light, dark (data-theme) and phone/desktop in a browser; fonts load from the app; no overflow. README GIF still to record (Phase 6). Browser and preview server closed |
 | A6 | MVP T9: empty/error states, README, verify | 2026-11-23: 82 tests, lint, build, prettier pass. Storage-unavailable notice (latest-save-wins), placeholders sized to real cards. Preview flow checked at 390 and 1280 px: scenario and gear edits update the suggestion, gear survives reload, no console warnings, no horizontal overflow. Preview server and browser closed |
 | A5 | MVP T8: scenario picker + result card | 2026-11-23: 80 tests, lint, build pass; suggestion updates with scenario and gear; focal clamps to lens |
@@ -36,10 +36,10 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 - **Just finished:** MVP Tasks 1-7 (scaffold, theme, Card, types, gear helpers, storage, gear form wired into App, exposure math, suggestion engine with explanations).
 - **Known limits (not bugs, decide later):** night-sky really wants Manual mode but `ExposureMode` only has aperture/shutter priority; the engine raises ISO before opening the aperture (plan decision), so low light can use a slightly higher ISO than needed. Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does). Theme runtime vars are `--c-*`, mapped to Tailwind colours in `@theme inline` in `src/index.css`.
 - **A12 finding (2026-11-23):** Unsplash Lite (25k photos, 21,108 with model+ISO+f+shutter+focal) has 0 EOS R50 shots (R10: 0, R7: 1), and EXIF has no lens field, so the Sigma 18-50 cannot be identified. Only good for generic per-camera-class stats. FlickrExif (CC-BY-4.0, 13 MB labels) is gated on Hugging Face: owner must request access and log in (`! huggingface-cli login`) before A12 can continue. Raw data and scripts are in the session scratchpad, not the repo.
-- **MVP is built and committed locally (nothing pushed).** Waiting on the owner to choose what is next.
-- **A7 plan written (2026-11-23):** `docs/superpowers/plans/2026-11-23-phase1-exif-import.md` (7 tasks). Owner said "keep going", so it is being built. Progress: Tasks 1-4 done and committed locally (storage v2, photo helpers, photoStore, importer with exifr lite; lite needs per-block `pick`, a top-level `pick` throws). Next: Task 5 detectGear, Task 6 PhotoMode UI, Task 7 README + browser privacy check. Plan calls to check: store camera settings only (no image data or filenames); skip photos with no capture time.
+- **MVP and Phase 1 (A7) are built and committed locally (nothing pushed).** Photo mode lives in `src/components/PhotoMode.tsx` (opt-in toggle, import, detected gear with an explicit "Use this gear", two-click delete). Importer: `src/import/importPhotos.ts` with exifr's lite build; the lite build rejects a top-level `pick`, so fields are picked per block (see `PARSE_OPTIONS`). `src/import/exifFixture.ts` builds EXIF-only JPEGs for tests and sample generation. Storage DB is `settings-suggestor` v2 (stores gear, photos, settings). A7 plan calls the owner should confirm: store camera settings only (no image data or file names); photos with no capture time are skipped.
+- **Test tip:** PhotoMode's toggle is disabled until the saved choice loads, so tests must wait for it to be enabled before clicking (this caused flaky runs before).
 - **F1 detail:** with gear too dark for a sharp shot (e.g. street, night, ISO cap 1600), the card says "0.4 s keeps handheld shots steady" next to a blur warning. In `src/engine/explain.ts`, when `tooDark`, do not claim steadiness. Found during the A11 visual check.
-- **Next (owner to confirm; owner said do A11 first, then everything else):** A7 Phase 1 EXIF import needs its own plan proposed first (opt-in photo features). A11 theme swap comes after the app is built. Owner said "focus on the mvp" and parked the photo-analysis model idea (not queued). A12 stays blocked until the owner gets FlickrExif access.
+- **Next:** F1 (active), then A8 Phase 4 habits dashboard, which needs its own plan for the owner to approve first (product choices: what to show, how much history). Then A9, A10, SEC, FINAL. A12 stays blocked until the owner gets FlickrExif access. The photo-analysis model idea is parked (owner: "focus on the mvp").
 - **Blocked:** nothing.
 
 ## Decisions

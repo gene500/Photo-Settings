@@ -9,9 +9,18 @@ Pick a subject, the light, what you want from the shot and your focal length. Yo
 - **Your gear:** enter your lens and camera limits by hand. A generic kit lens (18-55mm f/3.5-5.6, ISO 100-6400) is filled in on first run.
 - **Rule-based, no photo analysis.** The suggestion comes from exposure math and a few photography rules of thumb (the reciprocal rule for handheld shutter speed, the 500 rule for stars). It never returns a value your gear cannot set; when the light is too dark or too bright for your gear it says so.
 
+## Photo mode (optional)
+
+Off by default. Switch on "Personalize with my photos" and choose some photos to let the app learn your camera and lens.
+
+- It reads only the camera settings stored inside each photo (camera, lens, focal length, aperture, shutter speed, ISO and the time it was taken). It does not keep the picture, the file name or where the file is.
+- Photos without a capture time are skipped. Importing the same photo twice does not count it twice.
+- The detected camera and lens are only suggested. Nothing changes until you press "Use this gear".
+- Everything stays in your browser. "Delete imported photo data" removes it, and turning the switch off hides the feature without deleting anything.
+
 ## Privacy
 
-Everything runs in your browser. There is no account, no server and no analytics. Your gear profile is saved only in your browser's own storage (IndexedDB) on your device. If your browser blocks storage, the app still works but tells you the gear will not be saved. Fonts are served from the app itself, not from a third party.
+Everything runs in your browser. There is no account, no server and no analytics. Your gear profile (and, if you switch on photo mode, the camera settings read from your photos) is saved only in your browser's own storage (IndexedDB) on your device. If your browser blocks storage, the app still works but tells you the gear will not be saved. Fonts are served from the app itself, not from a third party.
 
 ## Run it
 

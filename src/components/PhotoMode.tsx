@@ -85,7 +85,7 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
             id={toggleId}
             aria-describedby={hintId}
             type="checkbox"
-            className="mt-1 h-5 w-5"
+            className="mt-0.5 size-5 shrink-0 accent-accent-strong"
             checked={on === true}
             disabled={on === null || importing}
             onChange={(e) => toggle(e.target.checked)}
