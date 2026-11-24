@@ -135,3 +135,8 @@ export function reciprocalShutter(focalMm: number, stabilized: boolean): number 
   const base = 1 / focalMm
   return stabilized ? base * 4 : base
 }
+
+/** EV at ISO 100 of a shot, the inverse of `shutterFor`: log2(N² / t) - log2(ISO / 100). */
+export function exposureValue(aperture: number, shutterS: number, iso: number): number {
+  return Math.log2((aperture * aperture) / shutterS) - Math.log2(iso / 100)
+}
