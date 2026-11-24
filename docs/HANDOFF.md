@@ -4,7 +4,7 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A7 | Phase 1: EXIF import (opt-in) | paused | 60 min | Heavy |
+| A7 | Phase 1: EXIF import (opt-in) | active | 60 min | Heavy |
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
 | A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
 | A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
