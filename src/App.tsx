@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card } from './components/Card'
 import { GearForm } from './components/GearForm'
+import { PhotoMode } from './components/PhotoMode'
 import { ResultCard } from './components/ResultCard'
 import { ScenarioPicker } from './components/ScenarioPicker'
 import { clampFocal, isDefaultGear } from './engine/gear'
@@ -32,6 +33,8 @@ export function App() {
   const [scenario, setScenario] = useState<Scenario>(INITIAL_SCENARIO)
   const [saveFailed, setSaveFailed] = useState(false)
   const saveCount = useRef(0)
+  // GearForm only reads its value on mount, so changing it from outside needs a new key.
+  const [formKey, setFormKey] = useState(0)
 
   // Keep the focal length inside whatever lens the gear describes.
   const activeScenario = useMemo(
@@ -63,6 +66,11 @@ export function App() {
       // Ignore a slow earlier save once a newer one has started.
       if (mine === saveCount.current) setSaveFailed(!saved)
     })
+  }
+
+  function handleUseGear(next: GearProfile) {
+    handleGearChange(next)
+    setFormKey((k) => k + 1)
   }
 
   return (
@@ -105,10 +113,11 @@ export function App() {
                 reset when you reload.
               </p>
             ) : null}
-            <GearForm value={gear} onChange={handleGearChange} />
+            <GearForm key={formKey} value={gear} onChange={handleGearChange} />
           </div>
         )}
       </Card>
+      {gear ? <PhotoMode currentGear={gear} onUseGear={handleUseGear} /> : null}
     </main>
   )
 }
