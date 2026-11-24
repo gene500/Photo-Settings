@@ -4,11 +4,12 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A6 | MVP T9: empty/error states, README, verify, deploy prep | active | 30 min | Medium |
+| A6 | MVP T9: empty/error states, README, verify, deploy prep | paused | 30 min | Medium |
 | A7 | Phase 1: EXIF import (opt-in) | pending | 60 min | Heavy |
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
 | A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
 | A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
+| A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked 25 min | Medium |
 | A11 | Swap in Photo-App theme CSS (owner paste) | pending | 30 min | Medium |
 | SEC | Security review of pending changes | pending | 15 min | Medium |
 | FINAL | Full check, merge, push, confirm deploy+CI | pending | 20 min | Heavy |
@@ -33,6 +34,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 - **Owner decisions (2026-11-23):** design approved; scenario goal input and output shape approved; MVP-first phase order approved.
 - **Just finished:** MVP Tasks 1-7 (scaffold, theme, Card, types, gear helpers, storage, gear form wired into App, exposure math, suggestion engine with explanations).
 - **Known limits (not bugs, decide later):** night-sky really wants Manual mode but `ExposureMode` only has aperture/shutter priority; the engine raises ISO before opening the aperture (plan decision), so low light can use a slightly higher ISO than needed. Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does). Theme runtime vars are `--c-*`, mapped to Tailwind colours in `@theme inline` in `src/index.css`.
+- **A12 finding (2026-11-23):** Unsplash Lite (25k photos, 21,108 with model+ISO+f+shutter+focal) has 0 EOS R50 shots (R10: 0, R7: 1), and EXIF has no lens field, so the Sigma 18-50 cannot be identified. Only good for generic per-camera-class stats. FlickrExif (CC-BY-4.0, 13 MB labels) is gated on Hugging Face: owner must request access and log in (`! huggingface-cli login`) before A12 can continue. Raw data and scripts are in the session scratchpad, not the repo.
 - **Next:** MVP Task 9 (empty/error states, README, full-flow check), then A11 theme swap last. Format helpers `formatAperture` and `formatShutter` in `src/engine/format.ts` are ready for the result card.
 - **Blocked:** nothing.
 
