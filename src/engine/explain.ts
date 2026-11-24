@@ -17,6 +17,12 @@ export function explain(input: ExplainInput): string {
   const s = formatShutter(input.shutterS)
   const { subject, goal } = scenario
 
+  // The scenario sentences below promise a sharp, steady or frozen shot. Too dark for the
+  // gear means that cannot be promised, so say what the settings really are instead.
+  if (tooDark) {
+    return `${a} at ${s} is the best your gear can do in this light, with ISO ${iso} the most your camera allows.`
+  }
+
   let first: string
   if (subject === 'night-sky') {
     first = `A long ${s} exposure at ${a} gathers starlight, and keeping it under the 500 rule stops the stars turning into trails.`
@@ -32,7 +38,6 @@ export function explain(input: ExplainInput): string {
     first = `${a} balances sharpness and light, and ${s} keeps handheld shots steady.`
   }
 
-  if (tooDark) return `${first} ISO ${iso} is the most your camera allows in this light.`
   if (isoRaised) return `${first} ISO ${iso} makes up for the low light.`
   return first
 }

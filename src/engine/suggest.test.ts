@@ -176,4 +176,26 @@ describe('suggest', () => {
       }
     }
   })
+
+  it('does not promise a sharp, steady or frozen shot when the light is too dark for the gear', () => {
+    let tooDarkCases = 0
+    for (const gear of GEARS) {
+      for (const subject of SUBJECTS) {
+        for (const light of LIGHTS) {
+          for (const goal of GOALS) {
+            const s = scenario({ subject, light, goal, focalLengthMm: gear.focalMinMm })
+            const result = suggest(gear, s)
+            if (!result.warnings.some((w) => w.includes('darker than your gear')))
+              continue
+            tooDarkCases += 1
+            expect(result.explanation).not.toMatch(
+              /steady|sharp|freezes|stops the stars/i,
+            )
+            expect(result.explanation).toContain(`ISO ${result.iso}`)
+          }
+        }
+      }
+    }
+    expect(tooDarkCases).toBeGreaterThan(0)
+  })
 })
