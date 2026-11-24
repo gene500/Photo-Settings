@@ -5,7 +5,6 @@
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
 | A6 | MVP T9: empty/error states, README, verify, deploy prep | active | 30 min | Medium |
-| A6 | MVP T9: polish, README, deploy prep | pending | 25 min | Medium |
 | A7 | Phase 1: EXIF import (opt-in) | pending | 60 min | Heavy |
 | A8 | Phase 4: Habits dashboard (opt-in) | pending | 45 min | Medium |
 | A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
