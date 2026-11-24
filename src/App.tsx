@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card } from './components/Card'
 import { GearForm } from './components/GearForm'
 import { ResultCard } from './components/ResultCard'
@@ -15,10 +15,23 @@ const INITIAL_SCENARIO: Scenario = {
   focalLengthMm: 35,
 }
 
+/** Holds the place of a card while the saved gear loads, so the page does not jump. */
+function Placeholder({ className }: { className: string }) {
+  return (
+    <div
+      data-testid="placeholder"
+      aria-hidden="true"
+      className={`rounded-2xl border border-line bg-card ${className}`}
+    />
+  )
+}
+
 export function App() {
   // null while the saved profile is loading
   const [gear, setGear] = useState<GearProfile | null>(null)
   const [scenario, setScenario] = useState<Scenario>(INITIAL_SCENARIO)
+  const [saveFailed, setSaveFailed] = useState(false)
+  const saveCount = useRef(0)
 
   // Keep the focal length inside whatever lens the gear describes.
   const activeScenario = useMemo(
@@ -45,7 +58,11 @@ export function App() {
 
   function handleGearChange(next: GearProfile) {
     setGear(next)
-    void saveGear(next)
+    const mine = ++saveCount.current
+    void saveGear(next).then((saved) => {
+      // Ignore a slow earlier save once a newer one has started.
+      if (mine === saveCount.current) setSaveFailed(!saved)
+    })
   }
 
   return (
@@ -65,7 +82,12 @@ export function App() {
             <ResultCard suggestion={suggestion} />
           </Card>
         </>
-      ) : null}
+      ) : (
+        <>
+          <Placeholder className="h-[25.5rem] sm:h-[15.5rem]" />
+          <Placeholder className="h-[15rem]" />
+        </>
+      )}
       <Card title="Your gear">
         {gear === null ? (
           <p className="text-muted">Loading your gear…</p>
@@ -75,6 +97,12 @@ export function App() {
               <p className="text-sm text-muted">
                 Using a generic kit lens (18-55mm f/3.5-5.6). Edit the details below to
                 match your camera.
+              </p>
+            ) : null}
+            {saveFailed ? (
+              <p role="status" className="text-sm text-danger">
+                Your browser is blocking storage, so your gear will not be saved. It will
+                reset when you reload.
               </p>
             ) : null}
             <GearForm value={gear} onChange={handleGearChange} />
