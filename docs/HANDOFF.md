@@ -4,8 +4,7 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A2 | MVP T2: theme, fonts, app shell | active | 20 min | Light |
-| A3 | MVP T3-5: gear types, storage, form | pending | 50 min | Medium |
+| A3 | MVP T3-5: gear types, storage, form | active | 50 min | Medium |
 | A4 | MVP T6-7: exposure math + suggest engine | pending | 60 min | Heavy |
 | A5 | MVP T8: scenario picker + result card | pending | 30 min | Medium |
 | A6 | MVP T9: polish, README, deploy prep | pending | 25 min | Medium |
@@ -23,6 +22,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 | ID | Task | Done |
 |----|------|------|
 | A1 | Design doc, builder check, MVP plan, Phase 0 scaffold (MVP T1) | 2026-11-23: test, lint, build pass; dev server served 200 |
+| A2 | MVP T2: theme, fonts, app shell | 2026-11-23: 3 tests, lint, build pass; computed colors match Photo-App in light and dark; no horizontal scroll at 390px |
 
 ## Current work
 
@@ -30,8 +30,8 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 - **Repo:** `~/Photo-Settings`, remote `https://github.com/gene500/Photo-Settings` (was empty). Local branch `main`; one local commit (scaffold + docs); nothing pushed yet. Pushing waits for the owner's "push".
 - **Execution:** Native (I implement tasks in-session), one fresh Opus review of the whole branch at the end (FINAL). Owner said "start working on everything" on 2026-11-23; local commits after each working step follow the owner's spec.
 - **Owner decisions (2026-11-23):** design approved; scenario goal input and output shape approved; MVP-first phase order approved.
-- **Just finished:** MVP Task 1 (scaffold). Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does).
-- **Next:** MVP Task 2 (theme, fonts, shell), then Tasks 3-9 in order.
+- **Just finished:** MVP Tasks 1-2 (scaffold, theme, fonts, Card). Vite 8, React 19, Tailwind v4, Vitest, ESLint, Prettier. TypeScript pinned to 6.0.x because typescript-eslint does not support TS 7 yet (unpin when it does). Theme runtime vars are `--c-*`, mapped to Tailwind colours in `@theme inline` in `src/index.css`.
+- **Next:** MVP Tasks 3-5 (types, gear helpers, storage, gear form), then 6-9 in order.
 - **Blocked:** nothing.
 
 ## Decisions

@@ -1,1 +1,62 @@
 @import 'tailwindcss';
+
+/* Tokens copied from the owner's Photo-App. Light is the default; dark follows the system. */
+:root {
+  --c-page: #ece6d8;
+  --c-card: #f7f2e6;
+  --c-ink: #1f1b14;
+  --c-muted: #6b6455;
+  --c-button: #26201a;
+  --c-button-ink: #faf6ec;
+  --c-field: rgba(61, 48, 25, 0.07);
+  --c-line: rgba(61, 48, 25, 0.13);
+  --c-accent: #8a7442;
+  --c-danger: #a6382d;
+  --c-shadow: 0 1px 2px rgba(31, 27, 20, 0.06), 0 8px 24px rgba(31, 27, 20, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-page: #0e0e0d;
+    --c-card: #1b1b19;
+    --c-ink: #ededea;
+    --c-muted: #a09f98;
+    --c-button: #ededea;
+    --c-button-ink: #111111;
+    --c-field: rgba(255, 255, 255, 0.07);
+    --c-line: rgba(255, 255, 255, 0.09);
+    --c-accent: #b9a47a;
+    --c-danger: #f19a92;
+    --c-shadow: none;
+  }
+}
+
+@theme inline {
+  --color-page: var(--c-page);
+  --color-card: var(--c-card);
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-button: var(--c-button);
+  --color-button-ink: var(--c-button-ink);
+  --color-field: var(--c-field);
+  --color-line: var(--c-line);
+  --color-accent: var(--c-accent);
+  --color-danger: var(--c-danger);
+  --shadow-card: var(--c-shadow);
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    'Bricolage Grotesque Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--c-page);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
