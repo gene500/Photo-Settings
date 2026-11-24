@@ -39,7 +39,7 @@ Built with Vite, React, TypeScript, Tailwind CSS and Vitest. The suggestion engi
 
 ## Deploy
 
-A static site: build with `npm run build` and serve `dist/`. On Vercel the Vite defaults work without extra config.
+A static site: build with `npm run build` and serve `dist/`. On Vercel the Vite defaults work; `vercel.json` adds a Content-Security-Policy that blocks all outside requests, plus other security headers.
 
 ## Project notes
 

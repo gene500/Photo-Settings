@@ -39,6 +39,10 @@ export function PhotoMode({
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
   const alive = useRef(true)
+  const loadCount = useRef(0)
+  const deleteButton = useRef<HTMLButtonElement>(null)
+  const cancelButton = useRef<HTMLButtonElement>(null)
+  const focusAfterConfirm = useRef<'cancel' | 'delete' | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const importing = progress !== null
 
@@ -56,8 +60,10 @@ export function PhotoMode({
   }, [])
 
   const refreshDetected = useCallback(async () => {
+    const request = ++loadCount.current
     const stored = await loadPhotos()
-    if (!alive.current) return
+    // Ignore a load that was overtaken by a newer load or by a delete.
+    if (!alive.current || request !== loadCount.current) return
     setPhotos(stored)
     setDetected(detectGear(stored))
   }, [])
@@ -77,6 +83,18 @@ export function PhotoMode({
     void savePersonalize(next)
   }
 
+  function askToConfirm(open: boolean) {
+    focusAfterConfirm.current = open ? 'cancel' : 'delete'
+    setConfirmDelete(open)
+  }
+
+  useEffect(() => {
+    const target = focusAfterConfirm.current
+    focusAfterConfirm.current = null
+    if (target === 'cancel') cancelButton.current?.focus()
+    if (target === 'delete') deleteButton.current?.focus()
+  }, [confirmDelete])
+
   function toggle(next: boolean) {
     setOn(next)
     setConfirmDelete(false)
@@ -87,6 +105,7 @@ export function PhotoMode({
     const files = list ? Array.from(list) : []
     if (files.length === 0) return
     setSummary(null)
+    setConfirmDelete(false)
     setProgress({ done: 0, total: files.length })
     try {
       const result = await importPhotos(files, (done, total) => {
@@ -100,8 +119,10 @@ export function PhotoMode({
   }
 
   async function handleDelete() {
+    loadCount.current++
     const ok = await clearPhotos()
     if (!alive.current) return
+    focusAfterConfirm.current = 'delete'
     setConfirmDelete(false)
     setDeleteFailed(!ok)
     if (ok) {
@@ -245,24 +266,27 @@ export function PhotoMode({
                   <button
                     type="button"
                     className="btn-danger"
+                    disabled={importing}
                     onClick={() => void handleDelete()}
                   >
                     Yes, delete all imported photo data
                   </button>
                   <button
+                    ref={cancelButton}
                     type="button"
                     className="btn-ghost"
-                    onClick={() => setConfirmDelete(false)}
+                    onClick={() => askToConfirm(false)}
                   >
                     Cancel
                   </button>
                 </>
               ) : (
                 <button
+                  ref={deleteButton}
                   type="button"
-                  className="btn-ghost"
+                  className="btn-ghost disabled:opacity-50"
                   disabled={importing}
-                  onClick={() => setConfirmDelete(true)}
+                  onClick={() => askToConfirm(true)}
                 >
                   Delete imported photo data
                 </button>

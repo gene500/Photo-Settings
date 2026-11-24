@@ -21,7 +21,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function ResultCard({ suggestion }: ResultCardProps) {
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4" aria-live="polite">
       <dl className="grid grid-cols-3 gap-2">
         <Stat label="Aperture" value={formatAperture(suggestion.aperture)} />
         <Stat label="Shutter" value={formatShutter(suggestion.shutterS)} />

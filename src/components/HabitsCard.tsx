@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { formatAperture, formatShutter } from '../engine/format'
 import { summarizeHabits, type Count } from '../engine/habits'
 import type { PhotoRecord } from '../types'
@@ -42,7 +43,7 @@ const rowsOf = (counts: Count[], text: (v: number) => string) =>
 
 /** How the owner shoots, in words and simple bars. Counts are always shown as text too. */
 export function HabitsCard({ photos }: { photos: PhotoRecord[] }) {
-  const habits = summarizeHabits(photos)
+  const habits = useMemo(() => summarizeHabits(photos), [photos])
   if (!habits) return null
   const busiest = habits.hours.indexOf(Math.max(...habits.hours))
   const { favorite } = habits

@@ -204,6 +204,34 @@ describe('PhotoMode', () => {
     await waitFor(() => expect(screen.queryByText('How you shoot')).toBeNull())
   })
 
+  it('closes the delete confirmation when an import starts, so a delete cannot undo mid-import', async () => {
+    await addPhotos([rec(1)])
+    vi.mocked(importer.importPhotos).mockImplementation(() => new Promise(() => {}))
+    const { user } = setup()
+    await turnOn(user)
+    await screen.findByText(/Canon EOS R50/)
+    await user.click(screen.getByRole('button', { name: 'Delete imported photo data' }))
+    expect(screen.getByRole('button', { name: /yes, delete/i })).toBeInTheDocument()
+    const { input, files } = pickFiles(2)
+    await user.upload(input, files)
+    expect(await screen.findByText(/Reading 0 of 2/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /yes, delete/i })).toBeNull()
+    expect(await countPhotos()).toBe(1)
+  })
+
+  it('moves focus to Cancel when asking to confirm, and back to Delete after cancelling', async () => {
+    await addPhotos([rec(1)])
+    const { user } = setup()
+    await turnOn(user)
+    await screen.findByText(/Canon EOS R50/)
+    await user.click(screen.getByRole('button', { name: 'Delete imported photo data' }))
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus()
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(
+      screen.getByRole('button', { name: 'Delete imported photo data' }),
+    ).toHaveFocus()
+  })
+
   it('shows no habits card when there are no photos', async () => {
     const { user } = setup()
     await turnOn(user)

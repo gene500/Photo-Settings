@@ -20,6 +20,13 @@ describe('ResultCard', () => {
     expect(screen.getByText('ISO').nextElementSibling).toHaveTextContent('100')
   })
 
+  it('announces a changed suggestion to screen readers', () => {
+    render(<ResultCard suggestion={suggestion} />)
+    expect(
+      screen.getByText(/keeps the scene sharp/).closest('[aria-live]'),
+    ).toHaveAttribute('aria-live', 'polite')
+  })
+
   it('shows the explanation and the camera mode', () => {
     render(<ResultCard suggestion={suggestion} />)
     expect(screen.getByText(/keeps the scene sharp/)).toBeInTheDocument()
