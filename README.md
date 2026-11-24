@@ -16,6 +16,7 @@ Off by default. Switch on "Personalize with my photos" and choose some photos to
 - It reads only the camera settings stored inside each photo (camera, lens, focal length, aperture, shutter speed, ISO and the time it was taken). It does not keep the picture, the file name or where the file is.
 - Photos without a capture time are skipped. Importing the same photo twice does not count it twice.
 - The detected camera and lens are only suggested. Nothing changes until you press "Use this gear".
+- Once photos are imported, a "How you shoot" card shows your most used aperture, ISO, shutter and focal length, how often you use high ISO or slow shutters, your busiest time of day, and bars for apertures and ISO.
 - Everything stays in your browser. "Delete imported photo data" removes it, and turning the switch off hides the feature without deleting anything.
 
 ## Privacy

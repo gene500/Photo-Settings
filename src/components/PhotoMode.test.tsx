@@ -187,4 +187,21 @@ describe('PhotoMode', () => {
     await waitFor(async () => expect(await countPhotos()).toBe(0))
     expect(screen.queryByRole('button', { name: 'Use this gear' })).toBeNull()
   })
+
+  it('shows how you shoot once photos exist, and removes it when the data is deleted', async () => {
+    await addPhotos([rec(1), rec(2)])
+    const { user } = setup()
+    await turnOn(user)
+    expect(await screen.findByText('How you shoot')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Delete imported photo data' }))
+    await user.click(screen.getByRole('button', { name: /yes, delete/i }))
+    await waitFor(() => expect(screen.queryByText('How you shoot')).toBeNull())
+  })
+
+  it('shows no habits card when there are no photos', async () => {
+    const { user } = setup()
+    await turnOn(user)
+    await screen.findByRole('button', { name: /choose photos/i })
+    expect(screen.queryByText('How you shoot')).toBeNull()
+  })
 })

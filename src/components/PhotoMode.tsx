@@ -3,8 +3,9 @@ import { detectGear, type DetectedGear } from '../engine/detectGear'
 import { importPhotos, type ImportSummary } from '../import/importPhotos'
 import { clearPhotos, loadPhotos } from '../storage/photoStore'
 import { loadPhotoMode, savePhotoMode } from '../storage/settingsStore'
-import type { GearProfile } from '../types'
+import type { GearProfile, PhotoRecord } from '../types'
 import { Card } from './Card'
+import { HabitsCard } from './HabitsCard'
 
 interface PhotoModeProps {
   currentGear: GearProfile
@@ -19,6 +20,7 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const [summary, setSummary] = useState<ImportSummary | null>(null)
   const [detected, setDetected] = useState<DetectedGear | null>(null)
+  const [photos, setPhotos] = useState<PhotoRecord[]>([])
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
   const alive = useRef(true)
@@ -36,8 +38,10 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
   }, [])
 
   const refreshDetected = useCallback(async () => {
-    const found = detectGear(await loadPhotos())
-    if (alive.current) setDetected(found)
+    const stored = await loadPhotos()
+    if (!alive.current) return
+    setPhotos(stored)
+    setDetected(detectGear(stored))
   }, [])
 
   useEffect(() => {
@@ -73,6 +77,7 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
     setDeleteFailed(!ok)
     if (ok) {
       setDetected(null)
+      setPhotos([])
       setSummary(null)
     }
   }
@@ -174,6 +179,8 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
                 </div>
               </div>
             ) : null}
+
+            <HabitsCard photos={photos} />
 
             {deleteFailed ? (
               <p role="alert" className="banner-error">
