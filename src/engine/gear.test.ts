@@ -1,5 +1,11 @@
 import type { GearProfile } from '../types'
-import { DEFAULT_GEAR, apertureMaxAt, clampFocal, validateGear } from './gear'
+import {
+  DEFAULT_GEAR,
+  apertureMaxAt,
+  clampFocal,
+  isDefaultGear,
+  validateGear,
+} from './gear'
 
 const prime: GearProfile = {
   ...DEFAULT_GEAR,
@@ -30,6 +36,15 @@ describe('apertureMaxAt', () => {
   it('clamps focal length outside the lens range before interpolating', () => {
     expect(apertureMaxAt(DEFAULT_GEAR, 10)).toBeCloseTo(3.5, 5)
     expect(apertureMaxAt(DEFAULT_GEAR, 200)).toBeCloseTo(5.6, 5)
+  })
+})
+
+describe('isDefaultGear', () => {
+  it('is true for DEFAULT_GEAR and false once any field differs', () => {
+    expect(isDefaultGear({ ...DEFAULT_GEAR })).toBe(true)
+    expect(isDefaultGear({ ...DEFAULT_GEAR, isoMax: 12800 })).toBe(false)
+    expect(isDefaultGear({ ...DEFAULT_GEAR, lensName: 'Mine' })).toBe(false)
+    expect(isDefaultGear({ ...DEFAULT_GEAR, stabilized: false })).toBe(false)
   })
 })
 

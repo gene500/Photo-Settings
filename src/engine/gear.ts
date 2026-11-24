@@ -17,6 +17,13 @@ export const DEFAULT_GEAR: GearProfile = {
   stabilized: true,
 }
 
+/** True while the profile is exactly the generic first-run defaults. */
+export function isDefaultGear(gear: GearProfile): boolean {
+  return (Object.keys(DEFAULT_GEAR) as (keyof GearProfile)[]).every(
+    (key) => gear[key] === DEFAULT_GEAR[key],
+  )
+}
+
 export function clampFocal(gear: GearProfile, focalMm: number): number {
   return Math.min(gear.focalMaxMm, Math.max(gear.focalMinMm, focalMm))
 }
