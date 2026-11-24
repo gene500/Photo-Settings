@@ -5,7 +5,6 @@
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
 | A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked | 25 min | Medium |
-| SEC | Security review of pending changes | pending | 15 min | Medium |
 | FINAL | Full check, merge, push, confirm deploy+CI | pending | 20 min | Heavy |
 
 MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5, 6 get their own plans later.
