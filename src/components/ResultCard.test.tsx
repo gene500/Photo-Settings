@@ -45,4 +45,11 @@ describe('ResultCard', () => {
     render(<ResultCard suggestion={suggestion} />)
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })
+
+  it('says when the usual aperture was used, and says nothing otherwise', () => {
+    const { rerender } = render(<ResultCard suggestion={suggestion} />)
+    expect(screen.queryByText(/usual aperture/i)).toBeNull()
+    rerender(<ResultCard suggestion={{ ...suggestion, personalized: true }} />)
+    expect(screen.getByText(/moved toward your usual aperture/i)).toBeInTheDocument()
+  })
 })

@@ -1,4 +1,9 @@
-import { loadPhotoMode, savePhotoMode } from './settingsStore'
+import {
+  loadPersonalize,
+  loadPhotoMode,
+  savePersonalize,
+  savePhotoMode,
+} from './settingsStore'
 
 async function wipe() {
   await new Promise<void>((resolve) => {
@@ -43,5 +48,17 @@ describe('settingsStore', () => {
     })
     expect(await savePhotoMode(true)).toBe(false)
     expect(await loadPhotoMode()).toBe(false)
+  })
+
+  it('personalization defaults to off, is saved separately from photo mode, and is safe when storage is blocked', async () => {
+    expect(await loadPersonalize()).toBe(false)
+    expect(await savePersonalize(true)).toBe(true)
+    expect(await loadPersonalize()).toBe(true)
+    expect(await loadPhotoMode()).toBe(false)
+    vi.spyOn(indexedDB, 'open').mockImplementation(() => {
+      throw new Error('storage blocked')
+    })
+    expect(await loadPersonalize()).toBe(false)
+    expect(await savePersonalize(false)).toBe(false)
   })
 })

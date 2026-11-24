@@ -58,4 +58,38 @@ describe('App with photo mode', () => {
     expect(screen.queryByText(/generic kit lens/i)).toBeNull()
     await waitFor(async () => expect((await loadGear()).bodyName).toBe('Canon EOS R50'))
   })
+
+  it('nudges the suggested aperture only after the owner opts in', async () => {
+    await addPhotos(Array.from({ length: 25 }, (_, i) => ({ ...rec(i), aperture: 2.8 })))
+    const user = userEvent.setup()
+    render(<App />)
+    const aperture = async () =>
+      (await screen.findByText('Aperture', { selector: 'dt' })).nextElementSibling
+        ?.textContent
+    const before = await aperture()
+    expect(screen.queryByText(/moved toward your usual aperture/i)).toBeNull()
+
+    const toggle = await screen.findByRole('checkbox', {
+      name: 'Personalize with my photos',
+    })
+    await waitFor(() => expect(toggle).toBeEnabled())
+    await user.click(toggle)
+    const nudge = await screen.findByRole('checkbox', {
+      name: 'Nudge suggestions toward my usual aperture',
+    })
+    await waitFor(() => expect(nudge).toBeEnabled())
+    expect(await aperture()).toBe(before) // photo mode alone changes nothing
+
+    await user.click(nudge)
+    expect(
+      await screen.findByText(/moved toward your usual aperture/i),
+    ).toBeInTheDocument()
+    expect(await aperture()).not.toBe(before)
+
+    await user.click(nudge)
+    await waitFor(() =>
+      expect(screen.queryByText(/moved toward your usual aperture/i)).toBeNull(),
+    )
+    expect(await aperture()).toBe(before)
+  })
 })

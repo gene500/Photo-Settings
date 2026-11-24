@@ -32,6 +32,8 @@ export function App() {
   const [gear, setGear] = useState<GearProfile | null>(null)
   const [scenario, setScenario] = useState<Scenario>(INITIAL_SCENARIO)
   const [saveFailed, setSaveFailed] = useState(false)
+  // Set by photo mode only when the owner has opted in and has enough photos.
+  const [favoriteAperture, setFavoriteAperture] = useState<number | null>(null)
   const saveCount = useRef(0)
   // GearForm only reads its value on mount, so changing it from outside needs a new key.
   const [formKey, setFormKey] = useState(0)
@@ -45,8 +47,13 @@ export function App() {
     [gear, scenario],
   )
   const suggestion = useMemo(
-    () => (gear ? suggest(gear, activeScenario) : null),
-    [gear, activeScenario],
+    () =>
+      gear
+        ? suggest(gear, activeScenario, {
+            favoriteAperture: favoriteAperture ?? undefined,
+          })
+        : null,
+    [gear, activeScenario, favoriteAperture],
   )
 
   useEffect(() => {
@@ -117,7 +124,13 @@ export function App() {
           </div>
         )}
       </Card>
-      {gear ? <PhotoMode currentGear={gear} onUseGear={handleUseGear} /> : null}
+      {gear ? (
+        <PhotoMode
+          currentGear={gear}
+          onUseGear={handleUseGear}
+          onFavoriteApertureChange={setFavoriteAperture}
+        />
+      ) : null}
     </main>
   )
 }

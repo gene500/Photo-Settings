@@ -33,11 +33,22 @@ function focalNote(gear: GearProfile): string {
     : `${gear.focalMinMm}-${gear.focalMaxMm}mm`
 }
 
+export interface SuggestOptions {
+  /** The aperture the owner uses most. Only nudges the everyday starting aperture, by at most one stop. */
+  favoriteAperture?: number
+}
+
+const ONE_STOP = Math.SQRT2
+
 /**
  * Suggests aperture, shutter and ISO for a scenario. Always inside the gear's limits;
  * when the light cannot be matched the result is clamped and a warning says so.
  */
-export function suggest(gear: GearProfile, scenario: Scenario): Suggestion {
+export function suggest(
+  gear: GearProfile,
+  scenario: Scenario,
+  options: SuggestOptions = {},
+): Suggestion {
   const warnings: string[] = []
   const { subject, goal, light } = scenario
 
@@ -72,8 +83,20 @@ export function suggest(gear: GearProfile, scenario: Scenario): Suggestion {
     : subject === 'landscape' || subject === 'macro'
       ? 8
       : 5.6
-  let aperture = snapApertureWithin(Math.max(preferred, widest), widest, narrowest)
+  const defaultStart = snapApertureWithin(Math.max(preferred, widest), widest, narrowest)
+  let aperture = defaultStart
+  // A habit may move the everyday starting aperture by up to one stop, never more, and never
+  // when the goal needs a wide aperture: the rules above stay in charge.
+  const favorite = options.favoriteAperture
+  if (!wantsWide && favorite !== undefined && Number.isFinite(favorite) && favorite > 0) {
+    const nudged = Math.min(
+      Math.max(favorite, preferred / ONE_STOP),
+      preferred * ONE_STOP,
+    )
+    aperture = snapApertureWithin(Math.max(nudged, widest), widest, narrowest)
+  }
   const startAperture = aperture
+  const nudgedStart = aperture !== defaultStart
 
   // 4. Solve for ISO and shutter: lowest ISO first, then more ISO, then a wider aperture.
   const isos = isoStops(gear.isoMin, gear.isoMax)
@@ -137,6 +160,8 @@ export function suggest(gear: GearProfile, scenario: Scenario): Suggestion {
     iso,
     mode,
     warnings,
+    // Only claim the habit mattered if the final aperture is still the nudged one.
+    ...(nudgedStart && aperture === startAperture ? { personalized: true } : {}),
     explanation: explain({
       scenario,
       aperture,

@@ -2,13 +2,14 @@ import { openAppDb } from './db'
 
 const STORE = 'settings'
 const PHOTO_MODE_KEY = 'photoMode'
+const PERSONALIZE_KEY = 'personalize'
 
-/** Whether the opt-in photo features are on. Off unless the owner turned them on. Never throws. */
-export async function loadPhotoMode(): Promise<boolean> {
+/** A saved on/off choice. Off unless it was stored as exactly true. Never throws. */
+async function loadFlag(key: string): Promise<boolean> {
   try {
     const db = await openAppDb()
     try {
-      return (await db.get(STORE, PHOTO_MODE_KEY)) === true
+      return (await db.get(STORE, key)) === true
     } finally {
       db.close()
     }
@@ -17,12 +18,12 @@ export async function loadPhotoMode(): Promise<boolean> {
   }
 }
 
-/** Saves the photo-mode choice. Returns false, without throwing, if storage is unavailable. */
-export async function savePhotoMode(on: boolean): Promise<boolean> {
+/** Saves an on/off choice. Returns false, without throwing, if storage is unavailable. */
+async function saveFlag(key: string, on: boolean): Promise<boolean> {
   try {
     const db = await openAppDb()
     try {
-      await db.put(STORE, on, PHOTO_MODE_KEY)
+      await db.put(STORE, on, key)
       return true
     } finally {
       db.close()
@@ -31,3 +32,11 @@ export async function savePhotoMode(on: boolean): Promise<boolean> {
     return false
   }
 }
+
+/** Whether the opt-in photo features are on. Off unless the owner turned them on. */
+export const loadPhotoMode = () => loadFlag(PHOTO_MODE_KEY)
+export const savePhotoMode = (on: boolean) => saveFlag(PHOTO_MODE_KEY, on)
+
+/** Whether suggestions may be nudged toward the owner's habits. Off unless turned on. */
+export const loadPersonalize = () => loadFlag(PERSONALIZE_KEY)
+export const savePersonalize = (on: boolean) => saveFlag(PERSONALIZE_KEY, on)

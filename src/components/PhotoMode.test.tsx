@@ -42,10 +42,16 @@ const summary = (over = {}) => ({
   ...over,
 })
 
-function setup(onUseGear = vi.fn()) {
+function setup(onUseGear = vi.fn(), onFavoriteApertureChange = vi.fn()) {
   const user = userEvent.setup()
-  const utils = render(<PhotoMode currentGear={DEFAULT_GEAR} onUseGear={onUseGear} />)
-  return { user, onUseGear, ...utils }
+  const utils = render(
+    <PhotoMode
+      currentGear={DEFAULT_GEAR}
+      onUseGear={onUseGear}
+      onFavoriteApertureChange={onFavoriteApertureChange}
+    />,
+  )
+  return { user, onUseGear, onFavoriteApertureChange, ...utils }
 }
 
 async function turnOn(user: ReturnType<typeof userEvent.setup>) {
@@ -203,5 +209,76 @@ describe('PhotoMode', () => {
     await turnOn(user)
     await screen.findByRole('button', { name: /choose photos/i })
     expect(screen.queryByText('How you shoot')).toBeNull()
+  })
+
+  describe('nudging suggestions toward my usual aperture', () => {
+    const NUDGE = 'Nudge suggestions toward my usual aperture'
+    const many = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({ ...rec(i), aperture: 4 }))
+
+    it('is off by default and tells the app there is no favourite', async () => {
+      await addPhotos(many(25))
+      const { user, onFavoriteApertureChange } = setup()
+      await turnOn(user)
+      const box = await screen.findByRole('checkbox', { name: NUDGE })
+      expect(box).not.toBeChecked()
+      expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(null)
+    })
+
+    it('turning it on passes the usual aperture, turning it off passes null, and it is remembered', async () => {
+      await addPhotos(many(25))
+      const { user, onFavoriteApertureChange, unmount } = setup()
+      await turnOn(user)
+      const box = await screen.findByRole('checkbox', { name: NUDGE })
+      await waitFor(() => expect(box).toBeEnabled())
+      await user.click(box)
+      await waitFor(() => expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(4))
+      unmount()
+      const again = setup()
+      await waitFor(() =>
+        expect(again.onFavoriteApertureChange).toHaveBeenLastCalledWith(4),
+      )
+      const box2 = await screen.findByRole('checkbox', { name: NUDGE })
+      await user.click(box2)
+      await waitFor(() =>
+        expect(again.onFavoriteApertureChange).toHaveBeenLastCalledWith(null),
+      )
+    })
+
+    it('is disabled, with the reason, when there are fewer than 20 photos', async () => {
+      await addPhotos(many(5))
+      const { user, onFavoriteApertureChange } = setup()
+      await turnOn(user)
+      expect(await screen.findByRole('checkbox', { name: NUDGE })).toBeDisabled()
+      expect(screen.getByText(/at least 20 photos/i)).toBeInTheDocument()
+      expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(null)
+    })
+
+    it('passes null again after the photo data is deleted', async () => {
+      await addPhotos(many(25))
+      const { user, onFavoriteApertureChange } = setup()
+      await turnOn(user)
+      const box = await screen.findByRole('checkbox', { name: NUDGE })
+      await waitFor(() => expect(box).toBeEnabled())
+      await user.click(box)
+      await waitFor(() => expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(4))
+      await user.click(screen.getByRole('button', { name: 'Delete imported photo data' }))
+      await user.click(screen.getByRole('button', { name: /yes, delete/i }))
+      await waitFor(() => expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(null))
+    })
+
+    it('passes null when photo mode is off', async () => {
+      await addPhotos(many(25))
+      const { user, onFavoriteApertureChange } = setup()
+      await turnOn(user)
+      const box = await screen.findByRole('checkbox', { name: NUDGE })
+      await waitFor(() => expect(box).toBeEnabled())
+      await user.click(box)
+      await waitFor(() => expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(4))
+      await user.click(
+        screen.getByRole('checkbox', { name: 'Personalize with my photos' }),
+      )
+      await waitFor(() => expect(onFavoriteApertureChange).toHaveBeenLastCalledWith(null))
+    })
   })
 })

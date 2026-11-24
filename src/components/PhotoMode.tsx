@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { detectGear, type DetectedGear } from '../engine/detectGear'
+import { MIN_PHOTOS_FOR_HABITS, summarizeHabits, usualAperture } from '../engine/habits'
 import { importPhotos, type ImportSummary } from '../import/importPhotos'
 import { clearPhotos, loadPhotos } from '../storage/photoStore'
-import { loadPhotoMode, savePhotoMode } from '../storage/settingsStore'
+import {
+  loadPersonalize,
+  loadPhotoMode,
+  savePersonalize,
+  savePhotoMode,
+} from '../storage/settingsStore'
 import type { GearProfile, PhotoRecord } from '../types'
 import { Card } from './Card'
 import { HabitsCard } from './HabitsCard'
@@ -10,17 +16,26 @@ import { HabitsCard } from './HabitsCard'
 interface PhotoModeProps {
   currentGear: GearProfile
   onUseGear: (gear: GearProfile) => void
+  /** The aperture to nudge suggestions toward, or null when personalization is off or not possible. */
+  onFavoriteApertureChange: (aperture: number | null) => void
 }
 
 /** Opt-in photo features. Off by default; nothing is read or stored until it is switched on. */
-export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
+export function PhotoMode({
+  currentGear,
+  onUseGear,
+  onFavoriteApertureChange,
+}: PhotoModeProps) {
   const toggleId = useId()
   const hintId = useId()
+  const nudgeId = useId()
+  const nudgeHintId = useId()
   const [on, setOn] = useState<boolean | null>(null) // null while the saved choice loads
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const [summary, setSummary] = useState<ImportSummary | null>(null)
   const [detected, setDetected] = useState<DetectedGear | null>(null)
   const [photos, setPhotos] = useState<PhotoRecord[]>([])
+  const [nudge, setNudge] = useState<boolean | null>(null) // null while the saved choice loads
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
   const alive = useRef(true)
@@ -31,6 +46,9 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
     alive.current = true
     void loadPhotoMode().then((saved) => {
       if (alive.current) setOn(saved)
+    })
+    void loadPersonalize().then((saved) => {
+      if (alive.current) setNudge(saved)
     })
     return () => {
       alive.current = false
@@ -47,6 +65,17 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
   useEffect(() => {
     if (on) void refreshDetected()
   }, [on, refreshDetected])
+
+  const usual = useMemo(() => usualAperture(summarizeHabits(photos)), [photos])
+  const nudging = on === true && nudge === true && usual !== null
+  useEffect(() => {
+    onFavoriteApertureChange(nudging ? usual : null)
+  }, [nudging, usual, onFavoriteApertureChange])
+
+  function toggleNudge(next: boolean) {
+    setNudge(next)
+    void savePersonalize(next)
+  }
 
   function toggle(next: boolean) {
     setOn(next)
@@ -181,6 +210,28 @@ export function PhotoMode({ currentGear, onUseGear }: PhotoModeProps) {
             ) : null}
 
             <HabitsCard photos={photos} />
+
+            <div className="flex items-start gap-3">
+              <input
+                id={nudgeId}
+                type="checkbox"
+                className="mt-0.5 size-5 shrink-0 accent-accent-strong"
+                aria-describedby={nudgeHintId}
+                checked={nudge === true && usual !== null}
+                disabled={nudge === null || usual === null || importing}
+                onChange={(e) => toggleNudge(e.target.checked)}
+              />
+              <div className="grid gap-1">
+                <label htmlFor={nudgeId} className="font-medium">
+                  Nudge suggestions toward my usual aperture
+                </label>
+                <span id={nudgeHintId} className="text-sm text-muted">
+                  {usual === null
+                    ? `Needs at least ${MIN_PHOTOS_FOR_HABITS} photos to learn from (you have ${photos.length}).`
+                    : 'Moves the starting aperture up to one stop toward the one you use most. Rules for blur, motion and stars still win.'}
+                </span>
+              </div>
+            </div>
 
             {deleteFailed ? (
               <p role="alert" className="banner-error">

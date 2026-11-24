@@ -17,6 +17,7 @@ Off by default. Switch on "Personalize with my photos" and choose some photos to
 - Photos without a capture time are skipped. Importing the same photo twice does not count it twice.
 - The detected camera and lens are only suggested. Nothing changes until you press "Use this gear".
 - Once photos are imported, a "How you shoot" card shows your most used aperture, ISO, shutter and focal length, how often you use high ISO or slow shutters, your busiest time of day, and bars for apertures and ISO.
+- A second switch, "Nudge suggestions toward my usual aperture", is off by default and needs at least 20 imported photos. When on, the everyday starting aperture moves up to one stop toward the one you use most. Blur, motion and star rules still win, your gear's limits always win, and the result says when this happened.
 - Everything stays in your browser. "Delete imported photo data" removes it, and turning the switch off hides the feature without deleting anything.
 
 ## Privacy

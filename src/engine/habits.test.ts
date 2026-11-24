@@ -1,5 +1,5 @@
 import type { PhotoRecord } from '../types'
-import { summarizeHabits } from './habits'
+import { MIN_PHOTOS_FOR_HABITS, summarizeHabits, usualAperture } from './habits'
 
 function photo(over: Partial<PhotoRecord> = {}, n = 0): PhotoRecord {
   return {
@@ -87,5 +87,20 @@ describe('summarizeHabits with a large library', () => {
   it('handles 200,000 photos without error', () => {
     const many = Array.from({ length: 200_000 }, (_, i) => photo({}, i % 60))
     expect(summarizeHabits(many)?.total).toBe(200_000)
+  })
+})
+
+describe('usualAperture', () => {
+  it('is null for no summary or too few photos', () => {
+    expect(usualAperture(null)).toBeNull()
+    const few = Array.from({ length: MIN_PHOTOS_FOR_HABITS - 1 }, (_, i) => photo({}, i))
+    expect(usualAperture(summarizeHabits(few))).toBeNull()
+  })
+
+  it('is the favourite aperture once there are enough photos', () => {
+    const enough = Array.from({ length: MIN_PHOTOS_FOR_HABITS }, (_, i) =>
+      photo({ aperture: 4 }, i),
+    )
+    expect(usualAperture(summarizeHabits(enough))).toBe(4)
   })
 })

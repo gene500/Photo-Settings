@@ -29,6 +29,11 @@ export function ResultCard({ suggestion }: ResultCardProps) {
       </dl>
       <p className="text-center text-sm text-muted">{MODE_LABEL[suggestion.mode]}</p>
       <p>{suggestion.explanation}</p>
+      {suggestion.personalized ? (
+        <p className="text-sm text-muted">
+          The aperture was moved toward your usual aperture.
+        </p>
+      ) : null}
       {suggestion.warnings.length > 0 ? (
         <ul className="banner-error grid gap-2">
           {suggestion.warnings.map((w) => (

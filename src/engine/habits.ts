@@ -79,3 +79,12 @@ export function summarizeHabits(photos: PhotoRecord[]): HabitSummary | null {
       photos.length,
   }
 }
+
+/** Fewer photos than this say too little about how someone shoots to change a suggestion. */
+export const MIN_PHOTOS_FOR_HABITS = 20
+
+/** The owner's usual aperture, or null when there is not enough to go on. */
+export function usualAperture(summary: HabitSummary | null): number | null {
+  if (summary === null || summary.total < MIN_PHOTOS_FOR_HABITS) return null
+  return summary.favorite.aperture
+}

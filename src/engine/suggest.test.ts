@@ -198,4 +198,71 @@ describe('suggest', () => {
     }
     expect(tooDarkCases).toBeGreaterThan(0)
   })
+
+  describe("with a favourite aperture from the owner's habits", () => {
+    const base = scenario({ subject: 'portrait', light: 'bright-sun', goal: 'balanced' })
+
+    it('is unchanged without a favourite', () => {
+      expect(suggest(DEFAULT_GEAR, base)).toEqual(suggest(DEFAULT_GEAR, base, {}))
+      expect(suggest(DEFAULT_GEAR, base).personalized).toBeUndefined()
+    })
+
+    it('moves the starting aperture toward the favourite, at most one stop', () => {
+      const plain = suggest(prime50, base)
+      expect(plain.aperture).toBe(5.6)
+      const wide = suggest(prime50, base, { favoriteAperture: 2.8 })
+      expect(wide.aperture).toBe(4)
+      expect(wide.personalized).toBe(true)
+      const narrow = suggest(prime50, base, { favoriteAperture: 16 })
+      expect(narrow.aperture).toBe(8)
+      expect(narrow.personalized).toBe(true)
+    })
+
+    it('does nothing when the favourite equals the default choice', () => {
+      const r = suggest(prime50, base, { favoriteAperture: 5.6 })
+      expect(r).toEqual(suggest(prime50, base))
+    })
+
+    it('is ignored when the goal needs a wide aperture', () => {
+      for (const goal of ['blur-background', 'freeze-motion'] as const) {
+        const s = scenario({ subject: 'portrait', light: 'bright-sun', goal })
+        expect(suggest(prime50, s, { favoriteAperture: 11 })).toEqual(suggest(prime50, s))
+      }
+    })
+
+    it('is ignored for night-sky', () => {
+      const s = scenario({ subject: 'night-sky', light: 'night', goal: 'balanced' })
+      expect(suggest(prime50, s, { favoriteAperture: 11 })).toEqual(suggest(prime50, s))
+    })
+
+    it('never leaves the gear limits, for any gear, scenario and favourite', () => {
+      for (const gear of GEARS) {
+        for (const subject of SUBJECTS) {
+          for (const light of LIGHTS) {
+            for (const favoriteAperture of [1.2, 2.8, 8, 32]) {
+              const s = scenario({
+                subject,
+                light,
+                goal: 'balanced',
+                focalLengthMm: gear.focalMinMm,
+              })
+              expectWithinLimits(
+                gear,
+                s.focalLengthMm,
+                suggest(gear, s, { favoriteAperture }),
+              )
+            }
+          }
+        }
+      }
+    })
+
+    it('ignores a favourite that is not a usable number', () => {
+      for (const favoriteAperture of [0, -3, Number.NaN, Number.POSITIVE_INFINITY]) {
+        expect(suggest(prime50, base, { favoriteAperture })).toEqual(
+          suggest(prime50, base),
+        )
+      }
+    })
+  })
 })

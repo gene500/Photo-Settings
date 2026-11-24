@@ -42,6 +42,8 @@ export interface Suggestion {
   mode: ExposureMode
   warnings: string[]
   explanation: string
+  /** True when the owner's usual aperture moved the starting aperture. */
+  personalized?: boolean
 }
 
 /** One photo's settings, read from EXIF. Used from Phase 1 onwards. */

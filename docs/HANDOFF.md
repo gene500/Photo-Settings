@@ -4,7 +4,6 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A9 | Phase 5: Personalization (opt-in) | pending | 60 min | Heavy |
 | A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
 | A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked | 25 min | Medium |
 | SEC | Security review of pending changes | pending | 15 min | Medium |
@@ -17,6 +16,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 | ID | Task | Done |
 |----|------|------|
 | A1 | Design doc, builder check, MVP plan, Phase 0 scaffold (MVP T1) | 2026-11-23: test, lint, build pass; dev server served 200 |
+| A9 | Phase 5: Personalization (opt-in) | 2026-11-24: plan `docs/superpowers/plans/2026-11-24-phase5-personalization.md`. `suggest(gear, scenario, { favoriteAperture })` nudges only the everyday starting aperture by at most one stop; ignored for blur, freeze-motion and night-sky; limits always win. Separate opt-in toggle (off by default, needs 20+ photos, saved as `personalize`), result card says when it applied. 210 tests (3 runs stable), lint, build pass. Not checked in a real browser (covered by an App-level test); the Phase 6 polish pass should include it. Owner calls I made: see the plan |
 | A8 | Phase 4: Habits dashboard (opt-in) | 2026-11-24: plan `docs/superpowers/plans/2026-11-24-phase4-habits.md`. `src/engine/habits.ts` (pure; handles 200k photos), `src/components/HabitsCard.tsx` (words plus CSS bars, counts always as text) shown inside the Personalize card; disappears on delete. Owner calls I made (change freely): no separate opt-in, no chart library, only favourites, high-ISO and slow-shutter shares, busiest hour, aperture and ISO bars (no hour-of-day bars). 193 tests (3 runs stable), lint, build pass. Browser check at phone width, light: no overflow, numbers match the fixtures. Server and browser closed |
 | F1 | Fix explanation text when light is too dark | 2026-11-23: when the light is too dark for the gear, `explain` no longer claims steady, sharp or frozen shots; it says the settings are the best the gear can do and names the ISO. New sweep test over all gear, subject, light and goal combinations checks no too-dark suggestion makes those claims (it failed first, then passed). 179 tests, lint, build pass |
 | A7 | Phase 1: EXIF import (opt-in) | 2026-11-23: 7 tasks done. Storage v2 (photos, settings stores), photo helpers, photoStore (dedupe, quota-safe), importer (exifr lite, 4 files at a time, 500 per write), detectGear, opt-in PhotoMode card wired into App, README section. 178 tests (5 full runs in a row stable), lint, build pass. Browser check on a build: 24 generated EXIF JPEGs + 1 no-EXIF + 1 repeat gave "Imported 24, skipped 1, already imported 1"; re-import gave 0 added, 3 already; only the app's own 5 files were requested (no network during import); Use this gear filled the form; reload kept toggle, gear and detected card; delete needs 2 clicks and clears photos but keeps the gear. Checked desktop light and phone dark (no overflow); phone light and desktop dark not separately checked (same theme tokens). Server and browser closed |
