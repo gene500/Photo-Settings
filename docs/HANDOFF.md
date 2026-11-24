@@ -4,7 +4,6 @@
 
 | ID | Task | Status | Est | Use |
 |----|------|--------|-----|-----|
-| A10 | Phase 6: Polish, GIF, final ship | pending | 45 min | Medium |
 | A12 | Dataset check: R50 + Sigma 18-50 coverage | blocked | 25 min | Medium |
 | SEC | Security review of pending changes | pending | 15 min | Medium |
 | FINAL | Full check, merge, push, confirm deploy+CI | pending | 20 min | Heavy |
@@ -16,6 +15,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 | ID | Task | Done |
 |----|------|------|
 | A1 | Design doc, builder check, MVP plan, Phase 0 scaffold (MVP T1) | 2026-11-23: test, lint, build pass; dev server served 200 |
+| A10 | Phase 6: Polish, GIF, final ship | 2026-11-24: polish pass on a real build with 24 generated EXIF photos: nudge flow works (f/5.6 to f/4 with the note, survives reload), 0 console warnings or errors, no horizontal overflow at phone width (light) or desktop (dark); earlier passes covered desktop light and phone dark. README GIF NOT recorded (needs a screen recording; owner follow-up, best done with real photos in `samples/`). Server and browser closed, fixtures removed |
 | A9 | Phase 5: Personalization (opt-in) | 2026-11-24: plan `docs/superpowers/plans/2026-11-24-phase5-personalization.md`. `suggest(gear, scenario, { favoriteAperture })` nudges only the everyday starting aperture by at most one stop; ignored for blur, freeze-motion and night-sky; limits always win. Separate opt-in toggle (off by default, needs 20+ photos, saved as `personalize`), result card says when it applied. 210 tests (3 runs stable), lint, build pass. Not checked in a real browser (covered by an App-level test); the Phase 6 polish pass should include it. Owner calls I made: see the plan |
 | A8 | Phase 4: Habits dashboard (opt-in) | 2026-11-24: plan `docs/superpowers/plans/2026-11-24-phase4-habits.md`. `src/engine/habits.ts` (pure; handles 200k photos), `src/components/HabitsCard.tsx` (words plus CSS bars, counts always as text) shown inside the Personalize card; disappears on delete. Owner calls I made (change freely): no separate opt-in, no chart library, only favourites, high-ISO and slow-shutter shares, busiest hour, aperture and ISO bars (no hour-of-day bars). 193 tests (3 runs stable), lint, build pass. Browser check at phone width, light: no overflow, numbers match the fixtures. Server and browser closed |
 | F1 | Fix explanation text when light is too dark | 2026-11-23: when the light is too dark for the gear, `explain` no longer claims steady, sharp or frozen shots; it says the settings are the best the gear can do and names the ISO. New sweep test over all gear, subject, light and goal combinations checks no too-dark suggestion makes those claims (it failed first, then passed). 179 tests, lint, build pass |
@@ -38,7 +38,7 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 - **A12 finding (2026-11-23):** Unsplash Lite (25k photos, 21,108 with model+ISO+f+shutter+focal) has 0 EOS R50 shots (R10: 0, R7: 1), and EXIF has no lens field, so the Sigma 18-50 cannot be identified. Only good for generic per-camera-class stats. FlickrExif (CC-BY-4.0, 13 MB labels) is gated on Hugging Face: owner must request access and log in (`! huggingface-cli login`) before A12 can continue. Raw data and scripts are in the session scratchpad, not the repo.
 - **MVP and Phase 1 (A7) are built and committed locally (nothing pushed).** Photo mode lives in `src/components/PhotoMode.tsx` (opt-in toggle, import, detected gear with an explicit "Use this gear", two-click delete). Importer: `src/import/importPhotos.ts` with exifr's lite build; the lite build rejects a top-level `pick`, so fields are picked per block (see `PARSE_OPTIONS`). `src/import/exifFixture.ts` builds EXIF-only JPEGs for tests and sample generation. Storage DB is `settings-suggestor` v2 (stores gear, photos, settings). A7 plan calls the owner should confirm: store camera settings only (no image data or file names); photos with no capture time are skipped.
 - **Test tip:** PhotoMode's toggle is disabled until the saved choice loads, so tests must wait for it to be enabled before clicking (this caused flaky runs before).
-- **Next:** A8 Phase 4 habits dashboard, which needs its own plan for the owner to approve first (product choices: what to show, how much history). Then A9, A10, SEC, FINAL. A12 stays blocked until the owner gets FlickrExif access. The photo-analysis model idea is parked (owner: "focus on the mvp").
+- **Next:** SEC (security review), then FINAL (Opus full check; push waits for the owner's "push"). All feature phases are built (A7 to A10); the owner calls I made in the Phase 4 and 5 plans are open for the owner to change. A12 stays blocked until the owner gets FlickrExif access. The photo-analysis model idea is parked (owner: "focus on the mvp").
 - **Blocked:** nothing.
 
 ## Decisions
@@ -53,6 +53,8 @@ MVP plan: `docs/superpowers/plans/2026-11-23-mvp.md` (Tasks 1-9). Phases 1, 4, 5
 
 ## Owner follow-ups (not code)
 - Add 50-100 own photos to `samples/` (gitignored) for Phase 1.
+- Record the README demo GIF (toggle on, import, detected gear, suggestion changes); not done because it needs a screen recording.
+- Request FlickrExif access on Hugging Face and log in (`! huggingface-cli login`) if A12 should continue.
 - Link `gene500/Photo-Settings` to a new Vercel project (done in Phase 6, or earlier if wanted).
 
 ## Standing rules
