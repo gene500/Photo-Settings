@@ -1,62 +1,189 @@
-@import 'tailwindcss';
+/* ===== Photo-App look: one-file theme (Tailwind v4) ===== */
+/* Pasted by the owner on 2026-11-23 and swapped in (task A11). Kept as pasted except for two
+   deliberate changes, so it can still be diffed against docs/reference/photo-app-theme.css:
+   1. The Google Fonts @import is removed: fonts are self-hosted via @fontsource (see main.tsx),
+      so the app makes no third-party request (privacy promise in the README).
+   2. Font family names use the fontsource names ("Geist Variable", "Bricolage Grotesque Variable"). */
+@import "tailwindcss";
 
-/* Tokens copied from the owner's Photo-App. Light is the default; dark follows the system. */
-:root {
-  --c-page: #ece6d8;
-  --c-card: #f7f2e6;
-  --c-ink: #1f1b14;
-  --c-muted: #6b6455;
-  --c-button: #26201a;
-  --c-button-ink: #faf6ec;
-  --c-field: rgba(61, 48, 25, 0.07);
-  --c-line: rgba(61, 48, 25, 0.13);
-  --c-accent: #8a7442;
-  --c-danger: #a6382d;
-  --c-shadow: 0 1px 2px rgba(31, 27, 20, 0.06), 0 8px 24px rgba(31, 27, 20, 0.08);
+/* Touch screens get 44px controls */
+@custom-variant touch {
+  @media (max-width: 1023px) { @slot; }
+  @media (pointer: coarse) { @slot; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --c-page: #0e0e0d;
-    --c-card: #1b1b19;
-    --c-ink: #ededea;
-    --c-muted: #a09f98;
-    --c-button: #ededea;
-    --c-button-ink: #111111;
-    --c-field: rgba(255, 255, 255, 0.07);
-    --c-line: rgba(255, 255, 255, 0.09);
-    --c-accent: #b9a47a;
-    --c-danger: #f19a92;
-    --c-shadow: none;
+/* dark: follows <html data-theme="light|dark">, else the OS */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) { @slot; }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) { @slot; }
   }
 }
 
+/* ---------- Tokens: light ---------- */
+:root {
+  --background: #ece6d8;
+  --surface: #f7f3e9;
+  --foreground: #1f1b14;
+  --muted: #655e4f;
+  --border: rgb(61 48 25 / 0.13);
+  --hover: rgb(61 48 25 / 0.07);
+  --accent: #d4bd8f;
+  --accent-strong: #6f5a2c;
+  --accent-soft: #e6d9bb;
+  --accent-foreground: #3d3320;
+  --ink: #26201a;
+  --ink-foreground: #faf6ec;
+  --danger: #a82a1e;
+  --danger-soft: #f5e0d8;
+  --sand: #7a5f2a;
+  --route: #a8834b;
+}
+
+/* ---------- Tokens: dark (both blocks must match) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --background: #0e0e0d;
+    --surface: #1b1b19;
+    --foreground: #ededea;
+    --muted: #a09f98;
+    --border: rgb(255 255 255 / 0.09);
+    --hover: rgb(255 255 255 / 0.07);
+    --accent: #b9a47a;
+    --accent-strong: #dcc99f;
+    --accent-soft: #34301f;
+    --accent-foreground: #1d1809;
+    --ink: #f2f2ee;
+    --ink-foreground: #111111;
+    --danger: #f19a92;
+    --danger-soft: #3a1f1c;
+    --sand: #dcc9a3;
+    --route: #d2b278;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0e0e0d;
+  --surface: #1b1b19;
+  --foreground: #ededea;
+  --muted: #a09f98;
+  --border: rgb(255 255 255 / 0.09);
+  --hover: rgb(255 255 255 / 0.07);
+  --accent: #b9a47a;
+  --accent-strong: #dcc99f;
+  --accent-soft: #34301f;
+  --accent-foreground: #1d1809;
+  --ink: #f2f2ee;
+  --ink-foreground: #111111;
+  --danger: #f19a92;
+  --danger-soft: #3a1f1c;
+  --sand: #dcc9a3;
+  --route: #d2b278;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+/* ---------- Tailwind colour + font names (bg-surface, text-muted, font-display...) ---------- */
 @theme inline {
-  --color-page: var(--c-page);
-  --color-card: var(--c-card);
-  --color-ink: var(--c-ink);
-  --color-muted: var(--c-muted);
-  --color-button: var(--c-button);
-  --color-button-ink: var(--c-button-ink);
-  --color-field: var(--c-field);
-  --color-line: var(--c-line);
-  --color-accent: var(--c-accent);
-  --color-danger: var(--c-danger);
-  --shadow-card: var(--c-shadow);
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    'Bricolage Grotesque Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-hover: var(--hover);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-sand: var(--sand);
+  --color-route: var(--route);
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
-body {
-  background: var(--c-page);
-  color: var(--c-ink);
-  font-family: var(--font-sans);
+/* ---------- Base ---------- */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html[data-text-size="large"] { font-size: 112.5%; }
+html[data-text-size="xlarge"] { font-size: 125%; }
+body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+h1, h2, h3, legend, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  font-weight: 600;
+/* ---------- Components ---------- */
+@layer components {
+  .btn-primary {
+    @apply inline-flex min-h-9 touch:min-h-11 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2 text-sm font-medium text-ink-foreground transition active:scale-[0.97] hover:opacity-85 disabled:opacity-50 aria-disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex min-h-9 touch:min-h-11 items-center justify-center gap-1.5 rounded-xl bg-hover px-3 py-1.5 text-sm font-medium text-foreground transition active:scale-[0.97] hover:bg-border disabled:opacity-50 aria-disabled:opacity-50;
+  }
+  .btn-accent {
+    @apply inline-flex min-h-9 touch:min-h-11 items-center justify-center rounded-xl bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground transition active:scale-[0.97] hover:brightness-95 disabled:opacity-50 aria-disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex min-h-9 touch:min-h-11 items-center rounded-lg px-2 text-sm text-muted transition active:scale-[0.97] hover:bg-hover hover:text-foreground;
+  }
+  .btn-danger {
+    @apply inline-flex min-h-9 touch:min-h-11 items-center justify-center gap-1.5 rounded-xl bg-danger px-4 py-2 text-sm font-medium text-ink-foreground transition active:scale-[0.97] hover:opacity-85 disabled:opacity-50 aria-disabled:opacity-50;
+  }
+  .btn-icon {
+    @apply flex h-9 w-9 touch:h-11 touch:w-11 shrink-0 items-center justify-center rounded-full text-lg leading-none text-muted transition active:scale-[0.94] hover:bg-hover hover:text-foreground;
+  }
+  .input {
+    @apply mt-1 w-full touch:min-h-11 rounded-xl bg-hover px-3 py-2 text-foreground placeholder:text-muted outline-none ring-1 ring-border focus:ring-2 focus:ring-accent-strong;
+  }
+  .card {
+    @apply rounded-2xl bg-surface text-foreground shadow-lg ring-1 ring-border;
+    animation: ui-rise 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .app-header {
+    @apply flex min-h-[3.25rem] items-center justify-between gap-2 bg-surface px-4 py-1 shadow-sm;
+  }
+  .dialog-backdrop { @apply fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4; }
+  .banner { @apply rounded-xl bg-surface px-3 py-2 text-xs text-muted shadow ring-1 ring-border; }
+  .banner-error { @apply rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger; }
+}
+
+/* ---------- Motion ---------- */
+@keyframes ui-rise { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes ui-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ui-slide-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+.anim-rise { animation: ui-rise 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-fade { animation: ui-fade 260ms ease-out both; }
+.anim-slide-in { animation: ui-slide-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.lift { transition: transform 180ms ease, box-shadow 180ms ease; }
+.lift:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgb(0 0 0 / 0.12); }
+
+html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, html[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Print: dark ink on white whatever the theme ---------- */
+@media print {
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    color-scheme: light !important;
+    --background: #fff !important; --surface: #fff !important; --foreground: #000 !important;
+    --muted: #444 !important; --border: rgb(0 0 0 / 0.2) !important; --hover: transparent !important;
+    --accent-strong: #000 !important; --accent-soft: #fff !important; --accent-foreground: #000 !important;
+  }
+}
+
+/* ---------- Windows high contrast ---------- */
+@media (forced-colors: active) {
+  .ring-1, .card, .input { border: 1px solid CanvasText; }
 }

@@ -32,8 +32,7 @@ const GOALS: { value: Goal; label: string }[] = [
   { value: 'blur-background', label: 'Blur the background' },
 ]
 
-const fieldClass =
-  'w-full rounded-xl bg-field px-3 py-2 text-base text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-accent disabled:opacity-60'
+const fieldClass = 'input text-base disabled:opacity-60'
 
 export function ScenarioPicker({ value, onChange, focalRange }: ScenarioPickerProps) {
   const baseId = useId()

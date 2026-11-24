@@ -139,8 +139,7 @@ export function GearForm({ value, onChange }: GearFormProps) {
     onChange(valid)
   }
 
-  const fieldClass =
-    'w-full rounded-xl bg-field px-3 py-2 text-base text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-accent'
+  const fieldClass = 'input text-base'
 
   return (
     <form className="grid gap-4" onSubmit={(e) => e.preventDefault()} noValidate>
@@ -202,7 +201,7 @@ export function GearForm({ value, onChange }: GearFormProps) {
       <label className="flex items-center gap-2 text-base">
         <input
           type="checkbox"
-          className="size-5 accent-accent"
+          className="size-5 accent-accent-strong"
           checked={draft.stabilized}
           onChange={(e) =>
             update({ ...draft, stabilized: e.target.checked }, fastestEdited)
@@ -212,7 +211,7 @@ export function GearForm({ value, onChange }: GearFormProps) {
       </label>
 
       {error ? (
-        <p role="alert" className="text-sm text-danger">
+        <p role="alert" className="banner-error">
           {error}
         </p>
       ) : null}

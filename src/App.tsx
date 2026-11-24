@@ -21,7 +21,7 @@ function Placeholder({ className }: { className: string }) {
     <div
       data-testid="placeholder"
       aria-hidden="true"
-      className={`rounded-2xl border border-line bg-card ${className}`}
+      className={`rounded-2xl bg-surface ring-1 ring-border ${className}`}
     />
   )
 }
@@ -67,7 +67,7 @@ export function App() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-4 py-8">
-      <h1 className="text-3xl">Settings Suggestor</h1>
+      <h1 className="text-3xl font-semibold">Settings Suggestor</h1>
       {gear && suggestion ? (
         <>
           <Card title="Your shot">
@@ -84,7 +84,7 @@ export function App() {
         </>
       ) : (
         <>
-          <Placeholder className="h-[25.5rem] sm:h-[15.5rem]" />
+          <Placeholder className="h-[27.5rem] sm:h-[16rem]" />
           <Placeholder className="h-[15rem]" />
         </>
       )}

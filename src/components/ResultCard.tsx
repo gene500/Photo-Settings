@@ -30,7 +30,7 @@ export function ResultCard({ suggestion }: ResultCardProps) {
       <p className="text-center text-sm text-muted">{MODE_LABEL[suggestion.mode]}</p>
       <p>{suggestion.explanation}</p>
       {suggestion.warnings.length > 0 ? (
-        <ul className="grid gap-2 rounded-xl border border-danger p-3 text-sm text-danger">
+        <ul className="banner-error grid gap-2">
           {suggestion.warnings.map((w) => (
             <li key={w}>{w}</li>
           ))}

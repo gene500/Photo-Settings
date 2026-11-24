@@ -8,12 +8,9 @@ interface CardProps {
 export function Card({ title, children }: CardProps) {
   const titleId = useId()
   return (
-    <section
-      aria-labelledby={title ? titleId : undefined}
-      className="rounded-2xl border border-line bg-card p-5 shadow-card"
-    >
+    <section aria-labelledby={title ? titleId : undefined} className="card p-5">
       {title ? (
-        <h2 id={titleId} className="mb-3 text-xl">
+        <h2 id={titleId} className="mb-3 text-xl font-semibold">
           {title}
         </h2>
       ) : null}
