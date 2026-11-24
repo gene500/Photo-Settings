@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 
 interface CardProps {
   title?: string
@@ -6,9 +6,17 @@ interface CardProps {
 }
 
 export function Card({ title, children }: CardProps) {
+  const titleId = useId()
   return (
-    <section className="rounded-2xl border border-line bg-card p-5 shadow-card">
-      {title ? <h2 className="mb-3 text-xl">{title}</h2> : null}
+    <section
+      aria-labelledby={title ? titleId : undefined}
+      className="rounded-2xl border border-line bg-card p-5 shadow-card"
+    >
+      {title ? (
+        <h2 id={titleId} className="mb-3 text-xl">
+          {title}
+        </h2>
+      ) : null}
       {children}
     </section>
   )
